@@ -12,7 +12,7 @@ from linebot_function.invoice import invoice
 from flask import Flask, request, abort
 from linebot import  LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage,TextSendMessage, ImageSendMessage, StickerSendMessage, LocationSendMessage, QuickReply, QuickReplyButton, MessageAction
+from linebot.models import MessageEvent, TextMessage,TextSendMessage, ImageSendMessage, StickerSendMessage, LocationSendMessage, QuickReply, QuickReplyButton, MessageAction,ImageMessage
 
 line_bot_api = LineBotApi('5rpf/HRRLIjyu6T5br1CXWLFaxwMY4w8cy1v50nhKmLEOMoVou9c9IwNSeNa32jWPMq5kYFqGk7FJm4Aa3oRosS3PbqbTQntCfWT5kKgj1gyeQ2eO0kDSg8W0VuCZT00whYjDzP359hpzduP95KSlwdB04t89/1O/w1cDnyilFU=/7oJVEqzz8kVG4Dwwem6V+KCeoAS2cG9I7yprBYxVk24YYBw53Vy1PfJ2Rq71wgUoU5x2fiBWXhIfgdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('5b059db759e4dfa3b5a44c2896faed21')
@@ -60,6 +60,15 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token,mtext)
     except :
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='有問題喔!'))
+
+@handler.add(MessageEvent ,message=ImageMessage)
+def handle_message_image(event):
+    ext = '.jpg'
+    message_content = line_bot_api.get_message_content(event.message.id)
+    with open(event.message.id + ext,'wb') as fd:
+        for chunk in message_content.iter_content():
+            fd.write(chunk)
+    line_bot_api.reply_message(event.reply_token,TextSendMessage(text='已儲存!'))
 
 if __name__ == '__main__':
     app.run()
